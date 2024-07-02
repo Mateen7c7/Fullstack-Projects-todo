@@ -13,14 +13,14 @@ export default function Home() {
   const userId = useStore((state) => state.userId);
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState("");
-  const completedTasks = tasks.filter((task) => task.completed);
-  const inCompleteTasks = tasks.filter((task) => !task.completed);
+  const completedTasks = tasks?.filter((task) => task.completed);
+  const inCompleteTasks = tasks?.filter((task) => !task.completed);
   // sort inCompletedTasks by created date
-  inCompleteTasks.sort((a, b) => {
+  inCompleteTasks?.sort((a, b) => {
     return new Date(b.$createdAt) - new Date(a.$createdAt);
   });
 
-  completedTasks.sort((a, b) => {
+  completedTasks?.sort((a, b) => {
     return new Date(a.$createdAt) - new Date(b.$createdAt);
   });
   const documentId = useRef();
@@ -30,9 +30,9 @@ export default function Home() {
     ]);
     promise.then(
       function (response) {
-        console.log(response.documents[0].user_tasks);
-        documentId.current = response.documents[0].$id;
-        setTasks(response.documents[0].user_tasks);
+        console.log(response?.documents[0].user_tasks);
+        documentId.current = response?.documents[0].$id;
+        setTasks(response?.documents[0].user_tasks);
       },
       function (error) {
         console.log(error);

@@ -7,16 +7,13 @@ export default function PrivateRoutes() {
   const userId = useStore((state) => state.userId);
   const setUserId = useStore((state) => state.setUserId);
 
-  const cookie = window.localStorage.getItem("cookieFallback");
-//   console.log(cookie);
-//   console.log("hello");
+  const cookie = window.localStorage?.getItem("cookieFallback");
 
   useEffect(() => {
-    if (cookie.length > 10) {
+    if (cookie?.length > 10) {
       const promise = account.get();
       promise.then(
         function (response) {
-        //   console.log(response);
           setUserId(response.$id);
         },
         function (error) {
@@ -26,6 +23,5 @@ export default function PrivateRoutes() {
     }
   }, [setUserId, cookie]);
 
-  //   let auth = { token: false };
   return userId ? <Outlet /> : <Navigate to="/login" />;
 }

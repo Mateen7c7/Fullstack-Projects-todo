@@ -8,14 +8,7 @@ export default function Login() {
   const setUserId = useStore((state) => state.setUserId);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   console.log(userId);
-  //   if (userId) {
-  //     navigate("/");
-  //   }
-  // }, [userId, navigate]);
 
   if (userId) {
     return <Navigate to="/" />;
