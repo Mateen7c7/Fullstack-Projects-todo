@@ -8,15 +8,15 @@ export default function PrivateRoutes() {
   const setUserId = useStore((state) => state.setUserId);
 
   const cookie = window.localStorage.getItem("cookieFallback");
-  console.log(cookie);
-  console.log("hello");
+//   console.log(cookie);
+//   console.log("hello");
 
   useEffect(() => {
     if (cookie.length > 10) {
       const promise = account.get();
       promise.then(
         function (response) {
-          console.log(response);
+        //   console.log(response);
           setUserId(response.$id);
         },
         function (error) {

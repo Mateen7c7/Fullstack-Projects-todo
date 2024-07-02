@@ -1,10 +1,34 @@
 import IncompleteTask from "../components/IncompleteTask";
 import data from "../data";
 import CompletedTask from "../components/CompleteTask";
+import useStore from "../store";
+import { useEffect, useState } from "react";
+import { databases } from "../appwrit";
+import { Query } from "appwrite";
+
+const databaseId = import.meta.env.VITE_TODO_DATABASE_ID;
+const dataCollectionId = import.meta.env.VITE_DATA_COLLECTION_ID;
 
 export default function Home() {
-  const completedTasks = data.filter((task) => task.complete);
-  const inCompleteTasks = data.filter((task) => !task.complete);
+  const userId = useStore((state) => state.userId);
+  const [tasks, setTasks] = useState([]);
+  const completedTasks = tasks.filter((task) => task.completed);
+  const inCompleteTasks = tasks.filter((task) => !task.completed);
+
+  useEffect(() => {
+    const promise = databases.listDocuments(databaseId, dataCollectionId, [
+      Query.equal("user_id", userId),
+    ]);
+    promise.then(
+      function (response) {
+        // console.log(response);
+        setTasks(response.documents[0].user_tasks);
+      },
+      function (error) {
+        console.log(error);
+      }
+    );
+  }, [userId]);
   return (
     <div className="w-full h-[100%]  px-4 space-y-3 flex flex-col">
       <div className=" flex-[5] w-full overflow-y-auto space-y-3">
@@ -13,7 +37,7 @@ export default function Home() {
         </div>
         <div className="space-y-2">
           {inCompleteTasks.map((task) => (
-            <IncompleteTask key={task.id} task={task} />
+            <IncompleteTask key={task.$id} task={task} />
           ))}
         </div>
         {completedTasks.length > 0 && (
@@ -21,7 +45,7 @@ export default function Home() {
         )}
         <div className="space-y-2">
           {completedTasks.map((task) => (
-            <CompletedTask key={task.id} task={task} />
+            <CompletedTask key={task.$id} task={task} />
           ))}
         </div>
       </div>
