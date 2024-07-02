@@ -1,8 +1,10 @@
-import { Client } from "appwrite";
+import { Account, Client } from "appwrite";
 
 const client = new Client();
 client
   .setEndpoint(import.meta.env.VITE_IP)
   .setProject(import.meta.env.VITE_PROJECT_ID);
 
-export { client };
+const account = new Account(client);
+
+export { client, account };

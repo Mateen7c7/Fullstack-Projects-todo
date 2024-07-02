@@ -1,4 +1,12 @@
+import { Navigate } from "react-router-dom";
+import useStore from "../store";
+
 export default function SignUp() {
+  const userId = useStore((state) => state.userId);
+
+  if (userId) {
+    return <Navigate to="/" />;
+  }
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col gap-3">
