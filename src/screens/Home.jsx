@@ -15,6 +15,14 @@ export default function Home() {
   const [newTask, setNewTask] = useState("");
   const completedTasks = tasks.filter((task) => task.completed);
   const inCompleteTasks = tasks.filter((task) => !task.completed);
+  // sort inCompletedTasks by created date
+  inCompleteTasks.sort((a, b) => {
+    return new Date(b.$createdAt) - new Date(a.$createdAt);
+  });
+
+  completedTasks.sort((a, b) => {
+    return new Date(a.$createdAt) - new Date(b.$createdAt);
+  });
   const documentId = useRef();
   useEffect(() => {
     const promise = databases.listDocuments(databaseId, dataCollectionId, [
@@ -31,6 +39,47 @@ export default function Home() {
       }
     );
   }, [userId]);
+
+  const handleCompleteTask = (id) => {
+    const index = tasks.findIndex((task) => task.$id === id);
+    const newTasks = [...tasks];
+    newTasks[index].completed = true;
+    setTasks(newTasks);
+
+    const promise = databases.updateDocument(
+      databaseId,
+      tasksCollectionId,
+      id,
+      {
+        completed: true,
+      }
+    );
+    promise.then(
+      function (response) {
+        console.log(response);
+      },
+      function (error) {
+        console.log(error);
+      }
+    );
+  };
+
+  const handleDeleteTask = (id) => {
+    const index = tasks.findIndex((task) => task.$id === id);
+    const newTasks = [...tasks];
+    newTasks.splice(index, 1);
+    setTasks(newTasks);
+
+    const promise = databases.deleteDocument(databaseId, tasksCollectionId, id);
+    promise.then(
+      function (response) {
+        console.log(response);
+      },
+      function (error) {
+        console.log(error);
+      }
+    );
+  };
 
   const handleSubmit = () => {
     if (newTask) {
@@ -66,7 +115,11 @@ export default function Home() {
         </div>
         <div className="space-y-2">
           {inCompleteTasks.map((task) => (
-            <IncompleteTask key={task.$id} task={task} />
+            <IncompleteTask
+              onClick={handleCompleteTask}
+              key={task.$id}
+              task={task}
+            />
           ))}
         </div>
         {completedTasks.length > 0 && (
@@ -74,7 +127,11 @@ export default function Home() {
         )}
         <div className="space-y-2">
           {completedTasks.map((task) => (
-            <CompletedTask key={task.$id} task={task} />
+            <CompletedTask
+              onClick={handleDeleteTask}
+              key={task.$id}
+              task={task}
+            />
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import useStore from "../store";
-import { useState } from "react";
+import {  useState } from "react";
 import { account } from "../appwrit";
 
 export default function Login() {
@@ -8,6 +8,14 @@ export default function Login() {
   const setUserId = useStore((state) => state.setUserId);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  // const navigate = useNavigate();
+
+  // useEffect(() => {
+  //   console.log(userId);
+  //   if (userId) {
+  //     navigate("/");
+  //   }
+  // }, [userId, navigate]);
 
   if (userId) {
     return <Navigate to="/" />;
