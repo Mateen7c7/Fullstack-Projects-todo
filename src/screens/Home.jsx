@@ -1,27 +1,29 @@
 import IncompleteTask from "../components/IncompleteTask";
-import data from "../data";
 import CompletedTask from "../components/CompleteTask";
 import useStore from "../store";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { databases } from "../appwrit";
-import { Query } from "appwrite";
+import { ID, Query } from "appwrite";
 
 const databaseId = import.meta.env.VITE_TODO_DATABASE_ID;
 const dataCollectionId = import.meta.env.VITE_DATA_COLLECTION_ID;
+const tasksCollectionId = import.meta.env.VITE_TASKS_COLLECTION_ID;
 
 export default function Home() {
   const userId = useStore((state) => state.userId);
   const [tasks, setTasks] = useState([]);
+  const [newTask, setNewTask] = useState("");
   const completedTasks = tasks.filter((task) => task.completed);
   const inCompleteTasks = tasks.filter((task) => !task.completed);
-
+  const documentId = useRef();
   useEffect(() => {
     const promise = databases.listDocuments(databaseId, dataCollectionId, [
       Query.equal("user_id", userId),
     ]);
     promise.then(
       function (response) {
-        // console.log(response);
+        console.log(response.documents[0].user_tasks);
+        documentId.current = response.documents[0].$id;
         setTasks(response.documents[0].user_tasks);
       },
       function (error) {
@@ -29,6 +31,33 @@ export default function Home() {
       }
     );
   }, [userId]);
+
+  const handleSubmit = () => {
+    if (newTask) {
+      const promise = databases.createDocument(
+        databaseId,
+        tasksCollectionId,
+        ID.unique(),
+        {
+          title: newTask,
+          data: documentId.current,
+        }
+      );
+
+      promise.then(
+        function (response) {
+          console.log(response);
+          setTasks([...tasks, response]);
+          setNewTask("");
+          // window.location.reload();
+        },
+        function (error) {
+          console.log(error);
+        }
+      );
+    }
+  };
+
   return (
     <div className="w-full h-[100%]  px-4 space-y-3 flex flex-col">
       <div className=" flex-[5] w-full overflow-y-auto space-y-3">
@@ -55,9 +84,14 @@ export default function Home() {
             type="text"
             className="w-full h-full bg-transparent outline-none px-4 placeholder:text-gray-500"
             placeholder="What do you want to do?"
+            value={newTask}
+            onChange={(e) => setNewTask(e.target.value)}
           />
         </div>
-        <div className="h-[45%] w-full bg-black rounded-b-md cursor-pointer">
+        <div
+          onClick={handleSubmit}
+          className="h-[45%] w-full bg-black rounded-b-md cursor-pointer"
+        >
           <h1 className="text-white text-2xl text-center pt-2">+ Add</h1>
         </div>
       </div>
